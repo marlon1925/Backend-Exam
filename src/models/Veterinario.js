@@ -43,7 +43,8 @@ const veterinarioSchema = new Schema({
     confirmEmail:{
         type:Boolean,
         default:false
-    }
+    },
+    
 
 },{
     timestamps:true

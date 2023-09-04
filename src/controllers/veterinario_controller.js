@@ -5,12 +5,12 @@ import mongoose from "mongoose";
 
 const login = async(req,res)=>{
     const {email,password} = req.body
-    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Sorry, you must fill in all the fields"})
     const veterinarioBDD = await Veterinario.findOne({email}).select("-status -__v -token -updatedAt -createdAt")
-    if(veterinarioBDD?.confirmEmail===false) return res.status(403).json({msg:"Lo sentimos, debe verificar su cuenta"})
-    if(!veterinarioBDD) return res.status(404).json({msg:"Lo sentimos, el usuario no se encuentra registrado"})
+    if(veterinarioBDD?.confirmEmail===false) return res.status(403).json({msg:"Sorry, you need to verify your account"})
+    if(!veterinarioBDD) return res.status(404).json({msg:"Sorry, the user is not registered"})
     const verificarPassword = await veterinarioBDD.matchPassword(password)
-    if(!verificarPassword) return res.status(404).json({msg:"Lo sentimos, el password no es el correcto"})
+    if(!verificarPassword) return res.status(404).json({msg:"Sorry, you must fill in all the fields"})
     const token = generarJWT(veterinarioBDD._id)
     const {nombre,apellido,direccion,telefono,_id} = veterinarioBDD
     res.status(200).json({
