@@ -36,56 +36,56 @@ const perfil =(req,res)=>{
 
 const registro = async (req,res)=>{
     const {email,password} = req.body
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Sorry, you must fill in all fields"})
     const verificarEmailBDD = await Veterinario.findOne({email})
-    if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
+    if(verificarEmailBDD) return res.status(400).json({msg:"Sorry, the email is already registered"})
     const nuevoVeterinario = new Veterinario(req.body)
     nuevoVeterinario.password = await nuevoVeterinario.encrypPassword(password)
     const token = nuevoVeterinario.crearToken()
     await sendMailToUser(email,token)
     await nuevoVeterinario.save()
-    res.status(200).json({msg:"Revisa tu correo electrónico para confirmar tu cuenta"})
+    res.status(200).json({msg:"Check your email to confirm your account"})
 }
 
 
 const confirmEmail = async (req,res)=>{
-    if(!(req.params.token)) return res.status(400).json({msg:"Lo sentimos, no se puede validar la cuenta"})
+    if(!(req.params.token)) return res.status(400).json({msg:"Sorry, account cannot be validated"})
     const veterinarioBDD = await Veterinario.findOne({token:req.params.token})
-    if(!veterinarioBDD?.token) return res.status(404).json({msg:"La cuenta ya ha sido confirmada"})
+    if(!veterinarioBDD?.token) return res.status(404).json({msg:"The account has already been confirmed"})
     veterinarioBDD.token = null
     veterinarioBDD.confirmEmail=true
     await veterinarioBDD.save()
-    res.status(200).json({msg:"Token confirmado, ya puedes iniciar sesión"}) 
+    res.status(200).json({msg:"Token confirmed, you can now log in"}) 
 }
 
 
 
 const listarVeterinarios = (req,res)=>{
-    res.status(200).json({res:'lista de veterinarios registrados'})
+    res.status(200).json({res:'List of registered veterinarians'})
 }
 
 
 const detalleVeterinario = async(req,res)=>{
     const {id} = req.params
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
+    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Sorry, it must be a valid id`});
     const veterinarioBDD = await Veterinario.findById(id).select("-password")
-    if(!veterinarioBDD) return res.status(404).json({msg:`Lo sentimos, no existe el veterinario ${id}`})
+    if(!veterinarioBDD) return res.status(404).json({msg:`Sorry, there is no vet ${id}`})
     res.status(200).json({msg:veterinarioBDD})
 }
 
 
 const actualizarPerfil = async (req,res)=>{
     const {id} = req.params
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Sorry, it must be a valid id`});
+    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Sorry, you must fill in all fields"})
     const veterinarioBDD = await Veterinario.findById(id)
-    if(!veterinarioBDD) return res.status(404).json({msg:`Lo sentimos, no existe el veterinario ${id}`})
+    if(!veterinarioBDD) return res.status(404).json({msg:`Sorry, there is no vet ${id}`})
     if (veterinarioBDD.email !=  req.body.email)
     {
         const veterinarioBDDMail = await Veterinario.findOne({email:req.body.email})
         if (veterinarioBDDMail)
         {
-            return res.status(404).json({msg:`Lo sentimos, el existe ya se encuentra registrado`})  
+            return res.status(404).json({msg:`Sorry, the exists is already registered`})  
         }
     }
     veterinarioBDD.nombre = req.body.nombre 
@@ -94,19 +94,19 @@ const actualizarPerfil = async (req,res)=>{
     veterinarioBDD.telefono = req.body.telefono 
     veterinarioBDD.email = req.body.email 
     await veterinarioBDD.save()
-    res.status(200).json({msg:"Perfil actualizado correctamente"})
+    res.status(200).json({msg:"Profile updated successfully"})
 }
 
 
 
 const actualizarPassword = async (req,res)=>{
     const veterinarioBDD = await Veterinario.findById(req.veterinarioBDD._id)
-    if(!veterinarioBDD) return res.status(404).json({msg:`Lo sentimos, no existe el veterinario ${id}`})
+    if(!veterinarioBDD) return res.status(404).json({msg:`Sorry, there is no vet ${id}`})
     const verificarPassword = await veterinarioBDD.matchPassword(req.body.passwordactual)
-    if(!verificarPassword) return res.status(404).json({msg:"Lo sentimos, el password actual no es el correcto"})
+    if(!verificarPassword) return res.status(404).json({msg:"Sorry, the current password is not correct"})
     veterinarioBDD.password = await veterinarioBDD.encrypPassword(req.body.passwordnuevo)
     await veterinarioBDD.save()
-    res.status(200).json({msg:"Password actualizado correctamente"})
+    res.status(200).json({msg:"Password updated successfully"})
 }
 
 
@@ -115,34 +115,34 @@ const actualizarPassword = async (req,res)=>{
 
 const recuperarPassword = async(req,res)=>{
     const {email} = req.body
-    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Sorry, you must fill in all fields"})
     const veterinarioBDD = await Veterinario.findOne({email})
-    if(!veterinarioBDD) return res.status(404).json({msg:"Lo sentimos, el usuario no se encuentra registrado"})
+    if(!veterinarioBDD) return res.status(404).json({msg:"Sorry, the user is not registered"})
     const token = veterinarioBDD.crearToken()
     veterinarioBDD.token=token
     await sendMailToRecoveryPassword(email,token)
     await veterinarioBDD.save()
-    res.status(200).json({msg:"Revisa tu correo electrónico para reestablecer tu cuenta"})
+    res.status(200).json({msg:"Check your email to reset your account"})
 }
 
 const comprobarTokenPasword = async (req,res)=>{
-    if(!(req.params.token)) return res.status(404).json({msg:"Lo sentimos, no se puede validar la cuenta"})
+    if(!(req.params.token)) return res.status(404).json({msg:"Sorry, account cannot be validated"})
     const veterinarioBDD = await Veterinario.findOne({token:req.params.token})
-    if(veterinarioBDD?.token !== req.params.token) return res.status(404).json({msg:"Lo sentimos, no se puede validar la cuenta"})
+    if(veterinarioBDD?.token !== req.params.token) return res.status(404).json({msg:"Sorry, account cannot be validated"})
     await veterinarioBDD.save()
-    res.status(200).json({msg:"Token confirmado, ya puedes crear tu nuevo password"}) 
+    res.status(200).json({msg:"Token confirmed, you can now create your new password"}) 
 }
 
 const nuevoPassword = async (req,res)=>{
     const{password,confirmpassword} = req.body
-    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    if(password != confirmpassword) return res.status(404).json({msg:"Lo sentimos, los passwords no coinciden"})
+    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Sorry, you must fill in all fields"})
+    if(password != confirmpassword) return res.status(404).json({msg:"Sorry, passwords don't match"})
     const veterinarioBDD = await Veterinario.findOne({token:req.params.token})
-    if(veterinarioBDD?.token !== req.params.token) return res.status(404).json({msg:"Lo sentimos, no se puede validar la cuenta"})
+    if(veterinarioBDD?.token !== req.params.token) return res.status(404).json({msg:"Sorry, account cannot be validated"})
     veterinarioBDD.token = null
     veterinarioBDD.password = await veterinarioBDD.encrypPassword(password)
     await veterinarioBDD.save()
-    res.status(200).json({msg:"Felicitaciones, ya puedes iniciar sesión con tu nuevo password"}) 
+    res.status(200).json({msg:"Congratulations, you can now log in with your new password"}) 
 }
 
 

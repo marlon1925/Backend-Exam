@@ -20,7 +20,7 @@ const sendMailToUser = async(userMail,token)=>{
     to: userMail,
     subject: "Verifica tu cuenta de correo electrónico",
     html: `
-    <h1>Sistema de gestión (HOLA-VET-ESFOT 🐶 😺)</h1>
+    <h1>Sistema de gestión (HI-VET-ESFOT 🐶 😺)</h1>
     <hr>
     <a href="https://veterinario-frontend.vercel.app/confirmar/${token}">Clic para confirmar tu cuenta</a>
     <hr>
@@ -36,11 +36,11 @@ const sendMailToRecoveryPassword = async(userMail,token)=>{
     let info = await transport.sendMail({
     from: 'admin@vet.com',
     to: userMail,
-    subject: "Correo para reestablecer tu contraseña",
+    subject: "Email to reset your password",
     html: `
     <h1>Sistema de gestión (VET-ESFOT 🐶 😺)</h1>
     <hr>
-    <a href="https://veterinario-frontend.vercel.app/recuperar-password/${token}">Clic para reestablecer tu contraseña</a>
+    <a href="https://veterinario-frontend.vercel.app/recuperar-password/${token}">Click to reset your password</a>
     <hr>
     <footer>Grandote te da la Bienvenida!</footer>
     `
